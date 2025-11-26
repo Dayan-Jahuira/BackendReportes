@@ -39,13 +39,55 @@ public class ReportesControlador {
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
         return ResponseEntity.ok("Backend Reportes is running! ✅");
-}
+    }
 
     @GetMapping("/estadisticas-generales")
     public ResponseEntity<EstadisticasGeneralesResponse> obtenerEstadisticasGenerales() {
         EstadisticasGeneralesResponse estadisticas = reportesServicio.obtenerEstadisticasGenerales();
         return ResponseEntity.ok(estadisticas);
     }
+
+    @GetMapping("/estadisticas-test")
+public ResponseEntity<EstadisticasGeneralesResponse> obtenerEstadisticasTest() {
+    // Datos de prueba FIJOS
+    EstadisticasGeneralesResponse estadisticas = new EstadisticasGeneralesResponse(
+        150,  // totalEstudiantes
+        25,   // totalDocentes  
+        18,   // reservasActivas
+        75.5, // tasaUso
+        45,   // reservasEsteMes
+        38,   // reservasMesAnterior
+        "↑ 18.4%"  // variacionReservas
+    );
+    return ResponseEntity.ok(estadisticas);
+}
+
+@GetMapping("/uso-espacios-test")
+public ResponseEntity<List<UsoEspacioResponse>> obtenerUsoEspaciosTest() {
+    // Datos de prueba FIJOS
+    List<UsoEspacioResponse> usoEspacios = List.of(
+        new UsoEspacioResponse("Laboratorio 01", "LAB-01", "Laboratorio", 45, 25.5),
+        new UsoEspacioResponse("Aula 302", "A-302", "Salon", 32, 18.2),
+        new UsoEspacioResponse("Laboratorio 15", "LAB-15", "Laboratorio", 28, 15.8),
+        new UsoEspacioResponse("Aula 105", "A-105", "Salon", 22, 12.4),
+        new UsoEspacioResponse("Laboratorio 08", "LAB-08", "Laboratorio", 18, 10.1)
+    );
+    return ResponseEntity.ok(usoEspacios);
+}
+
+@GetMapping("/reservas-mes-test") 
+public ResponseEntity<List<ReservasMesResponse>> obtenerReservasMesTest() {
+    // Datos de prueba FIJOS
+    List<ReservasMesResponse> reservasPorMes = List.of(
+        new ReservasMesResponse("Noviembre", 2025, 45),
+        new ReservasMesResponse("Octubre", 2025, 38),
+        new ReservasMesResponse("Septiembre", 2025, 42),
+        new ReservasMesResponse("Agosto", 2025, 35),
+        new ReservasMesResponse("Julio", 2025, 28),
+        new ReservasMesResponse("Junio", 2025, 31)
+    );
+    return ResponseEntity.ok(reservasPorMes);
+}
 
     @GetMapping("/uso-espacios")
     public ResponseEntity<List<UsoEspacioResponse>> obtenerUsoEspacios() {
