@@ -36,6 +36,11 @@ public class ReportesControlador {
         this.reportesServicio = reportesServicio;
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("Backend Reportes is running! ✅");
+}
+
     @GetMapping("/estadisticas-generales")
     public ResponseEntity<EstadisticasGeneralesResponse> obtenerEstadisticasGenerales() {
         EstadisticasGeneralesResponse estadisticas = reportesServicio.obtenerEstadisticasGenerales();
