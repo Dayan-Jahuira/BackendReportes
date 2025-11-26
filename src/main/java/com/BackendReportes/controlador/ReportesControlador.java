@@ -16,6 +16,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,9 +32,11 @@ import java.util.List;
 public class ReportesControlador {
 
     private final ReportesServicio reportesServicio;
+    private final JdbcTemplate jdbcTemplate;
 
-    public ReportesControlador(ReportesServicio reportesServicio) {
+    public ReportesControlador(ReportesServicio reportesServicio, JdbcTemplate jdbcTemplate) {
         this.reportesServicio = reportesServicio;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @GetMapping("/health")
@@ -87,6 +90,47 @@ public ResponseEntity<List<ReservasMesResponse>> obtenerReservasMesTest() {
         new ReservasMesResponse("Junio", 2025, 31)
     );
     return ResponseEntity.ok(reservasPorMes);
+}
+
+@GetMapping("/debug-sql")
+public ResponseEntity<String> debugSQL() {
+    StringBuilder resultado = new StringBuilder();
+    
+    try {
+        // 1. Probar consulta de estudiantes
+        resultado.append("=== PRUEBA ESTUDIANTES ===\n");
+        try {
+            String sqlEstudiantes = "SELECT COUNT(*) FROM estudiante WHERE IdUsuario IN (SELECT IdUsuario FROM usuario WHERE Estado = 1)";
+            Integer count = jdbcTemplate.queryForObject(sqlEstudiantes, Integer.class);
+            resultado.append("✅ Estudiantes: ").append(count).append("\n");
+        } catch (Exception e) {
+            resultado.append("❌ Error estudiantes: ").append(e.getMessage()).append("\n");
+        }
+
+        // 2. Probar consulta de docentes
+        resultado.append("\n=== PRUEBA DOCENTES ===\n");
+        try {
+            String sqlDocentes = "SELECT COUNT(*) FROM docente WHERE IdUsuario IN (SELECT IdUsuario FROM usuario WHERE Estado = 1)";
+            Integer count = jdbcTemplate.queryForObject(sqlDocentes, Integer.class);
+            resultado.append("✅ Docentes: ").append(count).append("\n");
+        } catch (Exception e) {
+            resultado.append("❌ Error docentes: ").append(e.getMessage()).append("\n");
+        }
+
+        // 3. Probar consulta simple de usuarios
+        resultado.append("\n=== PRUEBA USUARIOS ===\n");
+        try {
+            Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM usuario WHERE Estado = 1", Integer.class);
+            resultado.append("✅ Usuarios activos: ").append(count).append("\n");
+        } catch (Exception e) {
+            resultado.append("❌ Error usuarios: ").append(e.getMessage()).append("\n");
+        }
+
+        return ResponseEntity.ok(resultado.toString());
+        
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body("Error general: " + e.getMessage());
+    }
 }
 
     @GetMapping("/uso-espacios")
